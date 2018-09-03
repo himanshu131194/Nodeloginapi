@@ -71,5 +71,28 @@ api.post('/signup', (req, res)=>{
 
 api.post('/profile', isLogged, (req, res)=>{
     const { user } = req.session;
-    res.send 
+    res.status(200).json({ user });
+})
+
+api.put('/changepass', isLogged,  async (req, res)=>{
+    try {
+      const { session, body } = req;
+      const {password} = body;
+      const {_id }  = session.user;
+      const user = await User.findById({_id});
+      if(user){
+         await user.changepass(password);
+         res.status(200).json({
+             status: "Pwd changed"
+         })
+      }else{
+        res.status(403).json({
+           status: user
+        })
+      }
+    }catch(error) {
+      res.status(403).json({
+          error : error.message
+      });
+    }
 })
